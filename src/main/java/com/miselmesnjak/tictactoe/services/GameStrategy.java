@@ -1,0 +1,14 @@
+package com.miselmesnjak.tictactoe.services;
+
+import com.miselmesnjak.tictactoe.domain.Cell;
+import com.miselmesnjak.tictactoe.domain.PlayBoard;
+import com.miselmesnjak.tictactoe.domain.Player;
+
+/**
+ * @author Misel Mesnjak
+ * @version 1.0
+ * @since 2017-02-07
+ */
+public interface GameStrategy {
+    Cell calculateMove(PlayBoard board, Player player) throws IllegalMove;
+}

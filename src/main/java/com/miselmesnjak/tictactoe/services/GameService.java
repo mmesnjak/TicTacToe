@@ -4,10 +4,7 @@ import com.miselmesnjak.tictactoe.domain.*;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
  * Created by Misel on 5.2.2017.
@@ -16,22 +13,51 @@ import java.util.TreeSet;
 @Data
 public class GameService {
     private final List<Game> gameList = new ArrayList<>();
-    private final Set<Player> players = new TreeSet<>();
+    private final Map<String, Player> players = new HashMap<>();
 
     public Game createNewGame(String first, String second) throws IllegalPlayerConfiguration {
         if (isIllegalPlayerConfiguration(first, second)) {
             throw new IllegalPlayerConfiguration();
         }
 
-        Player firstPlayer = new Player(first, CellValue.X);
-        players.add(firstPlayer);
-        Player secondPlayer = new Player(second, CellValue.O);
-        players.add(secondPlayer);
+        Player firstPlayer;
+        firstPlayer = players.containsKey(first) ? players.get(first) : new Player(first);
+        firstPlayer.setMark(CellValue.X);
+        players.put(first, firstPlayer);
 
-        Game game = new Game(gameList.size() + 1, firstPlayer, secondPlayer);
-        gameList.add(game);
+        Player secondPlayer;
+        secondPlayer = players.containsKey(second) ? players.get(second) : new Player(second);
+        secondPlayer.setMark(CellValue.O);
+        players.put(second, secondPlayer);
+
+        int gameId = gameList.size() + 1;
+        Game game = new Game(gameId, firstPlayer, secondPlayer);
+
+        gameList.add(chooseGameStrategy(game));
+
+        if (firstPlayer.isComputer()) {
+            playAIMove(gameId);
+        }
 
         return game;
+    }
+
+    private Game chooseGameStrategy(Game game) {
+        GameStrategy aiGameStrategy;
+        Player humanPlayer = game.getFirstPlayer().isComputer() ? game.getSecondPlayer() : game.getFirstPlayer();
+        if (humanPlayer.getWinPercentage() <= 0.3) aiGameStrategy = new WeakGameStrategy();
+        else if (humanPlayer.getWinPercentage() <= 0.9) aiGameStrategy = getRandomGameStrategy();
+        else aiGameStrategy = new StrongGameStrategy();
+
+        game.setAiGameStrategy(aiGameStrategy);
+
+        return game;
+    }
+
+    private GameStrategy getRandomGameStrategy() {
+        Random r = new Random();
+
+        return r.nextBoolean() ? new WeakGameStrategy() : new StrongGameStrategy();
     }
 
     private void checkMoveLegality(int row, int column, Game game) throws IllegalMove {
@@ -48,16 +74,16 @@ public class GameService {
         Game game = getGameById(gameId);
         checkMoveLegality(row, column, game);
 
-        game.getBoard().getCells()[row - 1][column - 1] = new Cell(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getMark());
+        game.getBoard().getCells()[row - 1][column - 1] = new Cell(game.getCurrentPlayer().getName(), game.getCurrentPlayer().getMark(), row - 1, column - 1);
         game.incrementMoves();
         game.switchPlayer();
 
         if (!checkGameStatus(game).equals(GameStatus.finished)) {
-            playAIMove();
+            playAIMove(gameId);
         }
     }
 
-    private void playAIMove() {
+    private void playAIMove(int gameId) {
 
     }
 
@@ -72,8 +98,8 @@ public class GameService {
     }
 
     private boolean isIllegalPlayerConfiguration(String first, String second) {
-        return !(Player.COMPUTER.equals(first) || Player.COMPUTER.equals(second)) ||
-                (Player.COMPUTER.equals(first) && Player.COMPUTER.equals(second));
+        return !(Player.COMPUTER.equalsIgnoreCase(first) || Player.COMPUTER.equalsIgnoreCase(second)) ||
+                (Player.COMPUTER.equalsIgnoreCase(first) && Player.COMPUTER.equalsIgnoreCase(second));
     }
 
     public Game getGameById(int gameId) throws IllegalGameId {

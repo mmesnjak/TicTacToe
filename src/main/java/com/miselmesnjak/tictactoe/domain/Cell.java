@@ -11,12 +11,16 @@ import lombok.Data;
 public class Cell {
     private String player;
     private CellValue value;
+    private int x;
+    private int y;
 
     @Override
     public String toString() {
         return "Cell{" +
                 "player='" + player + '\'' +
                 ", value=" + value +
+                ", x=" + x +
+                ", y=" + y +
                 '}';
     }
 }

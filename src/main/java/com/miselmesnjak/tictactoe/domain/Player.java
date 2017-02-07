@@ -13,18 +13,34 @@ public class Player implements Comparable<Player> {
     private int loses;
     private int draws;
     private CellValue mark;
+    private boolean isComputer = false;
 
-    public Player(String name, CellValue mark) {
+    public Player(String name) {
         this.name = name;
-        this.mark = mark;
+        this.isComputer = COMPUTER.toLowerCase().equals(name.toLowerCase());
     }
 
     public double getWinPercentage() {
-        return wins / (wins + loses + draws);
+        return (wins + loses + draws) == 0 ? 0 : wins * 100 / (wins + loses + draws);
     }
 
     @Override
     public int compareTo(Player o) {
         return name.compareTo(o.name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Player)) return false;
+
+        Player player = (Player) o;
+
+        return name.equalsIgnoreCase(player.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }

@@ -1,9 +1,12 @@
 package com.miselmesnjak.tictactoe.domain;
 
+import com.miselmesnjak.tictactoe.services.GameStrategy;
 import lombok.Data;
 
 /**
- * Created by Misel on 5.2.2017.
+ * @author  Misel Mesnjak
+ * @version 1.0
+ * @since   2017-02-05
  */
 @Data
 public class Game {
@@ -17,6 +20,22 @@ public class Game {
     private Player winner;
     private Player currentPlayer;
     private int moves;
+    private GameStrategy aiGameStrategy;
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "gameId=" + gameId +
+                ", firstPlayer=" + firstPlayer +
+                ", secondPlayer=" + secondPlayer +
+                ", board=" + board +
+                ", status=" + status +
+                ", winner=" + winner +
+                ", currentPlayer=" + currentPlayer +
+                ", moves=" + moves +
+                ", aiGameStrategy=" + aiGameStrategy +
+                '}';
+    }
 
     public Game(int gameId, Player first, Player second) {
         this.gameId = gameId;
@@ -33,15 +52,4 @@ public class Game {
         this.moves++;
     }
 
-    @Override
-    public String toString() {
-        return "Game{" +
-                "gameId=" + gameId +
-                ", firstPlayer=" + firstPlayer +
-                ", secondPlayer=" + secondPlayer +
-                ", board=" + board +
-                ", status=" + status +
-                ", winner=" + winner +
-                '}';
-    }
 }
