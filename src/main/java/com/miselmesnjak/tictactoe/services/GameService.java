@@ -43,21 +43,11 @@ public class GameService {
     }
 
     private Game chooseGameStrategy(Game game) {
-        GameStrategy aiGameStrategy;
         Player humanPlayer = game.getFirstPlayer().isComputer() ? game.getSecondPlayer() : game.getFirstPlayer();
-        if (humanPlayer.getWinPercentage() <= 0.3) aiGameStrategy = new WeakGameStrategy();
-        else if (humanPlayer.getWinPercentage() <= 0.9) aiGameStrategy = getRandomGameStrategy();
-        else aiGameStrategy = new StrongGameStrategy();
 
-        game.setAiGameStrategy(aiGameStrategy);
+        game.setAiGameStrategy(GameStrategyFactory.create(humanPlayer));
 
         return game;
-    }
-
-    private GameStrategy getRandomGameStrategy() {
-        Random r = new Random();
-
-        return r.nextBoolean() ? new WeakGameStrategy() : new StrongGameStrategy();
     }
 
     private void checkMoveLegality(int row, int column, Game game) throws IllegalMove {
